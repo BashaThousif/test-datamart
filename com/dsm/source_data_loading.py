@@ -33,6 +33,7 @@ if __name__ == '__main__':
         for i in range(1,len(sys.argv)):
             src_list.append(sys.argv[i])
             call upper() on string as string-name.upper()'''
+
     src_list = app_conf["source_list"]
     # Check if passed from cmd line arg then override the above (e.g. source_list=OL,SB)
     for src in src_list:

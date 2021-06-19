@@ -28,6 +28,12 @@ if __name__ == '__main__':
     hadoop_conf.set("fs.s3a.access.key", app_secret["s3_conf"]["access_key"])
     hadoop_conf.set("fs.s3a.secret.key", app_secret["s3_conf"]["secret_access_key"])
 
+    ''' To read data from different sources uing command line arguments
+        src_list = []
+        for i in range(1,len(sys.argv)):
+            src_list.append(sys.argv[i])
+            call upper() on string as string-name.upper()'''
+
     src_list = app_conf["source_list"]
     # Check if passed from cmd line arg then override the above (e.g. source_list=OL,SB)
     for src in src_list:

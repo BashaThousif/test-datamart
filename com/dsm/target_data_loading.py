@@ -51,5 +51,44 @@ if __name__ == '__main__':
                 .mode("append") \
                 .save()
 
+        elif tgt == 'CHILD_DIM':
+            print("\nCreating CHILD_DIM table")
+            spark.read \
+                .parquet(staging_path+ "/" + tgt_conf["source_data"])\
+                .createOrReplaceTempView(tgt_conf["source_data"])
+
+            child_dim_df = spark.sql(tgt_conf["loadingQuery"])
+            child_dim_df.show()
+            jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+            print(jdbc_url)
+            child_dim_df.coalesce(1).write \
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("dbtable", tgt_conf["tableName"]) \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .mode("append") \
+                .save()
+
+        elif tgt == 'RTL_TXN_FACT':
+            print("\nCreating RTL_TXN_FACT table")
+            spark.read \
+                .parquet(staging_path + "/" + tgt_conf["source_data"]) \
+                .createOrReplaceTempView(tgt_conf["source_data"])
+
+            child_dim_df = spark.sql(tgt_conf["loadingQuery"])
+            child_dim_df.show()
+            jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+            print(jdbc_url)
+            child_dim_df.coalesce(1).write \
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("dbtable", tgt_conf["tableName"]) \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .mode("append") \
+                .save()
+
+
 
 # spark-submit --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.spark:spark-avro_2.11:2.4.2,org.apache.hadoop:hadoop-aws:2.7.4" com/dsm/target_data_loading.py

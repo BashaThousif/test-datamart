@@ -80,7 +80,7 @@ if __name__ == '__main__':
             print("\nReading customers data from S3 and write it to s3") # kc_extract.. KC_Extract_1_20171009
             cp_df = spark.read \
                 .option("mode", "DROPMALFORMED") \
-                .option("header", "false") \
+                .option("header", "true") \
                 .option("delimiter", "|") \
                 .option("inferSchema", "true") \
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/" + src_conf["s3_conf"]["filename"])

@@ -20,3 +20,22 @@ def write_to_s3(df, path):
         .mode("append") \
         .partitionBy("ins_dt") \
         .parquet(path)
+
+def read_from_redshift(spark,jdbc_url,s3_temp_path,query):
+    return spark.read \
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("query", query) \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("tempdir", s3_temp_path) \
+                .load()
+
+def write_to_redshift(df,jdbc_url,s3_temp_path,table_name):
+    df.write \
+      .format("io.github.spark_redshift_community.spark.redshift") \
+      .option("url", jdbc_url) \
+      .option("dbtable", table_name) \
+      .option("forward_spark_s3_credentials", "true") \
+      .option("tempdir", s3_temp_path) \
+      .mode("append") \
+      .save()
